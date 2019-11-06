@@ -37,7 +37,7 @@ def _prepare():
 
 
 def _callback(channel, method, properties, body):
-    r = loads(body)
+    r = loads(body.decode('utf-8'))
     print("RECIEVED image #{} with path {}".format(r['id'], r['path']))
 
     resulting_path = "/tmp/{}_{}.{}".format(str(datetime.now()), r['id'], 'png')

@@ -63,7 +63,7 @@ def receive_from_ml(id: int) -> str or None:
         if ok is None:
             break
 
-        r = loads(body)
+        r = loads(body.decode('utf-8'))
         db[int(r['id'])] = r['path']
         print("receive_from_ml {} at {}".format(r['id'], r['path']))
 

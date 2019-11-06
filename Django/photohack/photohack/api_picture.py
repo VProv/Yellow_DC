@@ -60,7 +60,7 @@ def result(request):
     except ObjectDoesNotExist:
         return Response(None, HTTP_404_NOT_FOUND)
 
-    if not urge_processing(picture):
+    if picture.processed is None and not urge_processing(picture):
         return None
 
     picture.refresh_from_db()
@@ -72,21 +72,16 @@ def urge_processing(picture: Picture) -> bool:
     """
     Try to urge picture processing
     """
-    print("urg_processing")
     # TODO
     new_path = receive_from_ml(picture.id)
 
     if new_path is None:
-        print("urg_processing: False")
         return False
 
     with open(new_path, 'rb') as f:
         content = f.read()
 
-    print("urg_processing: Saving")
-
     picture.processed.save(new_path.split('/')[-1], ContentFile(content))
-    print("urge_processing: Content saved")
 
     picture.save()
     picture.refresh_from_db()
