@@ -33,10 +33,7 @@ def upload(request):
     )
     new_picture.save()
 
-    # TODO
     send_to_ml(new_picture.id, new_picture.source.path)
-    new_picture.processed = None
-
     urge_processing(new_picture)
 
     return int(new_picture.id)
@@ -60,7 +57,7 @@ def result(request):
     except ObjectDoesNotExist:
         return Response(None, HTTP_404_NOT_FOUND)
 
-    if picture.processed is None and not urge_processing(picture):
+    if not picture.processing_finished and not urge_processing(picture):
         return None
 
     picture.refresh_from_db()
@@ -82,6 +79,7 @@ def urge_processing(picture: Picture) -> bool:
         content = f.read()
 
     picture.processed.save(new_path.split('/')[-1], ContentFile(content))
+    picture.processing_finished = True
 
     picture.save()
     picture.refresh_from_db()
